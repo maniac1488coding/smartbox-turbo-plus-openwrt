@@ -1,0 +1,13 @@
+# Полные дампы NAND: содержат прошивки производителя и device-specific данные,
+# к тому же весят 207 МБ. Снимаются заново скриптом (см. README).
+backup/
+# OpenWrt SDK: 1 ГБ, скачивается заново при необходимости пересобрать модуль.
+build/
+ko/
+# Артефакты сборки
+*.bin
+*.ipk
+slot1_openwrt_kernel.bin
+__pycache__/
+# Локальные device-specific значения
+device.local

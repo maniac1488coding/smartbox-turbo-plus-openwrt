@@ -1,0 +1,4 @@
+# Скопируйте в device.local и подставьте значения со своей наклейки.
+# device.local в .gitignore и в репозиторий не попадает.
+ROUTER_MAC="AA:BB:CC:DD:EE:FF"
+SERIAL="SD00000000000"
