@@ -1,8 +1,22 @@
-# Beeline SmartBox TURBO+ — устранение самопроизвольного отката на стоковую прошивку
+# Beeline SmartBox TURBO+ — как убрать самопроизвольный откат на стоковую прошивку
 
-Устройство: **Beeline SmartBox TURBO+** (OEM Sercomm S3 CQR), `beeline,smartbox-turbo-plus`.
-Прошивка: **OpenWrt 23.05.6** (r24232-539228933c), ядро 5.15.189, ramips/mt7621.
-Порт ПК: `enp5s0`, адрес роутера `192.168.1.1`.
+**Коротко.** Роутер периодически сам уходил на заводскую прошивку Beeline, после чего
+требовалась повторная прошивка и настройка. Причина — счётчик неудачных загрузок
+OEM-загрузчика Sercomm: после трёх загрузок, не дошедших до конца, он переключает флаг
+загрузки на второй слот, где лежит сток. Решение: сброс счётчика перенесён в самое начало
+загрузки, а во второй слот записан OpenWrt — теперь откат невозможен в принципе.
+
+<sub>**English.** A Beeline SmartBox TURBO+ (Sercomm S3 CQR, MT7621) running OpenWrt kept
+randomly reverting to the stock ISP firmware. Root cause: the Sercomm bootloader's
+failed-boot counter — after three incomplete boots it flips the boot flag to the second
+slot holding stock. Fix: the counter reset is moved to the very start of userspace, and
+OpenWrt is written into the second boot slot, so the fallback can no longer happen.</sub>
+
+---
+
+**Устройство:** Beeline SmartBox TURBO+ (OEM Sercomm S3 CQR), `beeline,smartbox-turbo-plus`
+**Прошивка:** OpenWrt 23.05.6 (r24232-539228933c), ядро 5.15.189, ramips/mt7621
+**Адрес роутера:** `192.168.1.1`. В примерах сетевой интерфейс ПК — `enp5s0`.
 
 ## Итог одной строкой
 
@@ -148,7 +162,7 @@ kernel_offset = 0x00a00100     rootfs_offset = 0x03000000
 на сток это не вернёт, но версии разъедутся. После каждого обновления запускайте на ПК:
 
 ```bash
-cd ~/DSH_cloude/smartbox && ./sync-slot1.sh
+./sync-slot1.sh        # запускать из каталога репозитория
 ```
 
 Скрипт сам считает ядро из нулевого слота, пересоберёт заголовок, загрузит модуль,
@@ -171,7 +185,7 @@ cd ~/DSH_cloude/smartbox && ./sync-slot1.sh
 Обратимо: в `backup/mtd5.bin` лежит оригинальное стоковое ядро.
 
 ```bash
-cd ~/DSH_cloude/smartbox
+cd <каталог репозитория>
 ./rsh.sh 'cat > /tmp/mtd-rw.ko' < tools/mtd-rw/mtd-rw.ko
 ./rsh.sh 'insmod /tmp/mtd-rw.ko i_want_a_brick=1'
 ./rsh.sh 'cat > /tmp/mtd5.bin' < backup/mtd5.bin
